@@ -15,11 +15,14 @@ const whichForeverBuf = execSync('which forever');
 const whichForever = whichForeverBuf ? whichForeverBuf.toString() : null;
 assert(whichForever, 'forever must be installed');
 
-const service = `#/etc/init.d/simple-server
+const service = `#!/bin/sh
+#/etc/init.d/simple-server
 
 case "$1" in
   start)
-    exec GITHUB_TOKEN=${githubToken} GITHUB_REPO_DIR=${githubRepoDir} ${whichForever} start -p ${process.env.HOME}/.forever -c ${whichNode} ${process.env.PWD}/index.js
+    export GITHUB_TOKEN=${githubToken}
+    export GITHUB_REPO_DIR=${githubRepoDir} 
+    exec ${whichForever} start -p ${process.env.HOME}/.forever -c ${whichNode} ${process.env.PWD}/index.js
     ;;
   stop)
     exec ${whichForever} stopall -c ${whichNode}

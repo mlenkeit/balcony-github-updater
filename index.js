@@ -9,6 +9,9 @@ const request = require('request');
 const githubToken = process.env.GITHUB_TOKEN;
 const githubRepoDir = process.env.GITHUB_REPO_DIR;
 
+console.log('GitHub Token', githubToken);
+console.log('Repository', githubRepoDir);
+
 const tunnel = localtunnel(5000, function(err, tunnel) {
     if (err) {
       return console.log('err', err);
@@ -54,6 +57,12 @@ const tunnel = localtunnel(5000, function(err, tunnel) {
           env: process.env
         });
         console.log('executing git', stdout.toString());
+        
+        const stdout2 = execSync('npm install', {
+          cwd: githubRepoDir,
+          env: process.env
+        });
+        console.log(stdout2);
       });
 
       const PORT = process.env.PORT || 5000;
