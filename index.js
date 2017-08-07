@@ -4,8 +4,10 @@ const bodyParser = require('body-parser');
 const exec = require('child_process').exec;
 const execSync = require('child_process').execSync;
 const express = require('express');
+const fs = require('fs');
 const localtunnel = require('localtunnel');
 const request = require('request');
+const path = require('path');
 
 const githubToken = process.env.GITHUB_TOKEN;
 const githubRepoDir = process.env.GITHUB_REPO_DIR;
@@ -66,6 +68,21 @@ const tunnel = localtunnel(5000, function(err, tunnel) {
         }, function(err, stdout) {
           console.log('err', err);
           console.log('stdout', stdout.toString());
+          
+          const metadata = {};
+          try {
+            const now = new Date();
+            const datetime = JSON.stringify(now).substr(1).slice(0, -1); // remove leading/trailing quote
+            const commit = execSync('git rev-parse HEAD', {
+              cwd: githubRepoDir,
+              env: process.env
+            }).toString();
+            metadata.buildNumber = buildNumber;
+            metadata.commit = commit;
+            metadata.datetime = datetime;
+          } catch( ) {}
+          const filepath = path.resolve(githubRepoDir, './build-metadata.json');
+          fs.writeFileSync(filepath, JSON.stringify(metadata, null, '  '));
 
           exec('/etc/init.d/server-pi restart', function(err, stdout) {
             console.log('err', err);
