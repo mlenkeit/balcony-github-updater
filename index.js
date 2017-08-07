@@ -77,10 +77,9 @@ const tunnel = localtunnel(5000, function(err, tunnel) {
               cwd: githubRepoDir,
               env: process.env
             }).toString();
-            metadata.buildNumber = buildNumber;
             metadata.commit = commit;
             metadata.datetime = datetime;
-          } catch( ) {}
+          } catch(e) {}
           const filepath = path.resolve(githubRepoDir, './build-metadata.json');
           fs.writeFileSync(filepath, JSON.stringify(metadata, null, '  '));
 
