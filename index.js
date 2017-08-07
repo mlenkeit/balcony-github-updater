@@ -1,6 +1,7 @@
 'use strict';
 
 const bodyParser = require('body-parser');
+const exec = require('child_process').exec;
 const execSync = require('child_process').execSync;
 const express = require('express');
 const localtunnel = require('localtunnel');
@@ -57,12 +58,20 @@ const tunnel = localtunnel(5000, function(err, tunnel) {
           env: process.env
         });
         console.log('executing git', stdout.toString());
-        
-        const stdout2 = execSync('npm install', {
+
+        process.env.NVM_DIR = '/root/.nvm';        
+        exec('[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && npm install', {
           cwd: githubRepoDir,
           env: process.env
+        }, function(err, stdout) {
+          console.log('err', err);
+          console.log('stdout', stdout.toString());
+
+          exec('/etc/init.d/server-pi restart', function(err, stdout) {
+            console.log('err', err);
+            console.log('stdout', stdout.toString());
+          });
         });
-        console.log(stdout2);
       });
 
       const PORT = process.env.PORT || 5000;
